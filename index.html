@@ -2,23 +2,37 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Analyse IRA">
+<link rel="apple-touch-icon" href="icon-180.png" sizes="180x180">
 <title>Analyse IRA - Fonctionnelle ou NTA</title>
 <style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        -webkit-tap-highlight-color: transparent;
+    }
     body {
         font-family: Arial, sans-serif;
         max-width: 700px;
         margin: auto;
         background: #f4f4f4;
-        padding: 20px;
+        padding: 5vw;
+        font-size: 1rem;
+        box-sizing: border-box;
     }
     h1 {
         text-align: center;
+        font-size: 1.6rem;
     }
     fieldset {
         border: 1px solid #ccc;
-        border-radius: 5px;
-        padding: 15px;
-        margin-top: 15px;
+        border-radius: 8px;
+        padding: 4vw;
+        margin-top: 4vw;
         background-color: #fff;
     }
     legend {
@@ -34,14 +48,15 @@
         display: flex;
         align-items: center;
         margin-bottom: 3px;
+        flex-wrap: wrap;
     }
     .input-row input[type="number"] {
-        padding: 5px;
-        width: 80px;
-        box-sizing: border-box;
-        margin-left: 10px;
+        padding: 0.6em;
+        width: 30%;
+        min-width: 80px;
+        font-size: 1.1rem;
         text-align: right;
-        font-size: 1em;
+        margin-left: 0.5em;
     }
     .input-unit {
         font-size: 0.9em;
@@ -51,14 +66,14 @@
     }
     button.analyse-btn {
         margin-top: 20px;
-        padding: 10px;
+        padding: 0.8em;
         width: 100%;
         background-color: #4CAF50;
         color: white;
         border: none;
-        font-size: 16px;
+        font-size: 1.1rem;
         cursor: pointer;
-        border-radius: 4px;
+        border-radius: 6px;
     }
     button.analyse-btn:hover {
         background-color: #45a049;
@@ -74,11 +89,11 @@
         margin-bottom: 8px;
     }
     .ira-fonctionnelle {
-        color: #007bff; /* bleu */
+        color: #007bff;
         font-weight: bold;
     }
     .nta {
-        color: #d9534f; /* rouge */
+        color: #d9534f;
         font-weight: bold;
     }
     .error {
@@ -87,39 +102,47 @@
         margin-top: 10px;
         text-align: center;
     }
-    /* Boîte de chiffres sous chaque input - tous les boutons sur une ligne */
+    /* Boîte de chiffres tactile avec défilement */
     .digit-box {
         margin-top: 5px;
         display: flex;
-        gap: 5px;
-        flex-wrap: nowrap; /* une seule ligne */
-        max-width: 280px;
+        gap: 8px;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 5px;
     }
     .digit-box button {
-        width: 30px;
-        height: 30px;
-        font-size: 16px;
+        flex: 0 0 auto;
+        min-width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
         cursor: pointer;
-        border-radius: 5px;
+        border-radius: 6px;
         border: 1px solid #ccc;
         background-color: #eee;
         transition: background-color 0.3s;
         user-select: none;
-        padding: 0;
-        line-height: 30px;
-        text-align: center;
     }
     .digit-box button:hover {
         background-color: #ddd;
     }
     .digit-box button.clear-btn {
-        width: 40px;
+        min-width: 60px;
         background-color: #f44336;
         color: white;
         font-weight: bold;
     }
     .digit-box button.clear-btn:hover {
         background-color: #d32f2f;
+    }
+    @media (max-width: 430px) {
+        body { font-size: 1.05rem; }
+        h1 { font-size: 1.4rem; }
+        .input-row input[type="number"] {
+            width: 45%;
+            font-size: 1.2rem;
+        }
     }
 </style>
 </head>
@@ -129,10 +152,8 @@
 <p>Entrez vos valeurs (cliquez sur un chiffre sous chaque champ) :</p>
 
 <form id="iraForm" onsubmit="return false;">
-
     <fieldset>
         <legend>Variables plasmatiques</legend>
-
         <label>
             <div class="input-row">
                 Urée plasmatique :
@@ -141,7 +162,6 @@
             </div>
             <div class="digit-box" data-target="ureeP"></div>
         </label>
-
         <label>
             <div class="input-row">
                 Créatininémie plasmatique :
@@ -150,7 +170,6 @@
             </div>
             <div class="digit-box" data-target="creatP"></div>
         </label>
-
         <label>
             <div class="input-row">
                 Natrémie :
@@ -163,7 +182,6 @@
 
     <fieldset>
         <legend>Variables urinaires</legend>
-
         <label>
             <div class="input-row">
                 Urée urinaire :
@@ -172,7 +190,6 @@
             </div>
             <div class="digit-box" data-target="ureeU"></div>
         </label>
-
         <label>
             <div class="input-row">
                 Créatinine urinaire :
@@ -181,7 +198,6 @@
             </div>
             <div class="digit-box" data-target="creatU"></div>
         </label>
-
         <label>
             <div class="input-row">
                 Natriurie :
@@ -190,7 +206,6 @@
             </div>
             <div class="digit-box" data-target="naU"></div>
         </label>
-
         <label>
             <div class="input-row">
                 Kaliurie :
@@ -207,65 +222,46 @@
 <div id="resultats" class="result" role="region" aria-live="polite"></div>
 
 <script>
-    // Générer boutons 1 à 9 + 0 + bouton effacer dans chaque boîte de chiffres
     document.querySelectorAll('.digit-box').forEach(box => {
-        // Chiffres 1 à 9
         for(let i=1; i<=9; i++) {
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.textContent = i;
             btn.setAttribute('aria-label', 'Chiffre ' + i);
             btn.addEventListener('click', () => {
-                const targetId = box.getAttribute('data-target');
-                const input = document.getElementById(targetId);
+                const input = document.getElementById(box.dataset.target);
                 if(input) {
                     let curVal = input.value || '';
-                    if(curVal === '0' || curVal === '') {
-                        input.value = i;
-                    } else {
-                        if(curVal.length < 7) {
-                            input.value = curVal + i;
-                        }
-                    }
+                    if(curVal === '0' || curVal === '') input.value = i;
+                    else if(curVal.length < 7) input.value = curVal + i;
                     input.focus();
                 }
             });
             box.appendChild(btn);
         }
-        // Chiffre 0 (après 1-9)
         const zeroBtn = document.createElement('button');
         zeroBtn.type = 'button';
         zeroBtn.textContent = '0';
         zeroBtn.setAttribute('aria-label', 'Chiffre 0');
         zeroBtn.addEventListener('click', () => {
-            const targetId = box.getAttribute('data-target');
-            const input = document.getElementById(targetId);
+            const input = document.getElementById(box.dataset.target);
             if(input) {
                 let curVal = input.value || '';
-                if(curVal !== '') {  // Ne pas laisser commencer par 0 tout seul
-                    if(curVal.length < 7) {
-                        input.value = curVal + '0';
-                    }
-                }
+                if(curVal !== '' && curVal.length < 7) input.value = curVal + '0';
                 input.focus();
             }
         });
         box.appendChild(zeroBtn);
 
-        // Bouton effacer (retour arrière)
         const clearBtn = document.createElement('button');
         clearBtn.type = 'button';
         clearBtn.textContent = '←';
         clearBtn.setAttribute('aria-label', 'Effacer dernier chiffre');
         clearBtn.classList.add('clear-btn');
         clearBtn.addEventListener('click', () => {
-            const targetId = box.getAttribute('data-target');
-            const input = document.getElementById(targetId);
+            const input = document.getElementById(box.dataset.target);
             if(input) {
-                let curVal = input.value || '';
-                if(curVal.length > 0) {
-                    input.value = curVal.slice(0, -1);
-                }
+                input.value = input.value.slice(0, -1);
                 input.focus();
             }
         });
@@ -282,108 +278,67 @@
             {id: 'naU', name: "Natriurie"},
             {id: 'kU', name: "Kaliurie"},
         ];
-
-        // Récupérer valeurs, convertir en float, null si vide ou <=0
-        let values = {};
-        let missingFields = [];
+        let values = {}, missingFields = [];
         for(let f of fields) {
             let valRaw = document.getElementById(f.id).value.trim();
             let valNum = parseFloat(valRaw);
             if(valRaw === "" || isNaN(valNum) || valNum <= 0) {
                 values[f.id] = null;
-                if(valRaw === "") {
-                    missingFields.push(f.name);
-                }
-            } else {
-                values[f.id] = valNum;
-            }
+                if(valRaw === "") missingFields.push(f.name);
+            } else values[f.id] = valNum;
         }
-
         clearError();
-
-        // Normes en texte
-        const normes = {
-            ratioUreeCreatP: "100",
-            feNa: "1%",
-            naK: "1",
-            upUree: "10",
-            upCreat: "30"
-        };
-
-        // Fonction pour classer résultats
+        const normes = {ratioUreeCreatP: "100", feNa: "1%", naK: "1", upUree: "10", upCreat: "30"};
         function getClassAndText(value, seuil, plusGrandMeilleur) {
-            if(plusGrandMeilleur) {
-                if(value > seuil) return {className: "ira-fonctionnelle", text: "IRA Fonctionnelle"};
-                else return {className: "nta", text: "NTA"};
-            } else {
-                if(value < seuil) return {className: "ira-fonctionnelle", text: "IRA Fonctionnelle"};
-                else return {className: "nta", text: "NTA"};
-            }
+            if(plusGrandMeilleur) return value > seuil ? {className: "ira-fonctionnelle", text: "IRA Fonctionnelle"} : {className: "nta", text: "NTA"};
+            else return value < seuil ? {className: "ira-fonctionnelle", text: "IRA Fonctionnelle"} : {className: "nta", text: "NTA"};
         }
-
-        // Construire résultats ligne par ligne selon données disponibles
         let results = [];
-
-        if(values.ureeP !== null && values.creatP !== null && values.creatP !== 0) {
-            let ratioUreeCreatP = (values.ureeP * 1000) / values.creatP;
-            let res = getClassAndText(ratioUreeCreatP, parseFloat(normes.ratioUreeCreatP), true);
-            results.push(`Urée/Créat plasmatique = ${ratioUreeCreatP.toFixed(1)} (norme ${normes.ratioUreeCreatP}) → <span class="${res.className}">${res.text}</span>`);
+        if(values.ureeP && values.creatP) {
+            let ratio = (values.ureeP * 1000) / values.creatP;
+            let res = getClassAndText(ratio, parseFloat(normes.ratioUreeCreatP), true);
+            results.push(`Urée/Créat plasmatique = ${ratio.toFixed(1)} (norme ${normes.ratioUreeCreatP}) → <span class="${res.className}">${res.text}</span>`);
         }
-
-        if(values.naU !== null && values.creatP !== null && values.naP !== null && values.creatU !== null && values.naP !== 0 && values.creatU !== 0) {
+        if(values.naU && values.creatP && values.naP && values.creatU) {
             let feNa = ((values.naU * values.creatP) / (values.naP * values.creatU)) * 100;
             let res = getClassAndText(feNa, parseFloat(normes.feNa), false);
             results.push(`FE Na+ = ${feNa.toFixed(2)}% (norme ${normes.feNa}) → <span class="${res.className}">${res.text}</span>`);
         }
-
-        if(values.naU !== null && values.kU !== null && values.kU !== 0) {
+        if(values.naU && values.kU) {
             let naKRatio = values.naU / values.kU;
             let res = getClassAndText(naKRatio, parseFloat(normes.naK), false);
             results.push(`Na+/K+ urinaire = ${naKRatio.toFixed(2)} (norme ${normes.naK}) → <span class="${res.className}">${res.text}</span>`);
         }
-
-        if(values.ureeU !== null && values.ureeP !== null && values.ureeP !== 0) {
+        if(values.ureeU && values.ureeP) {
             let upUree = values.ureeU / values.ureeP;
             let res = getClassAndText(upUree, parseFloat(normes.upUree), true);
             results.push(`U/P urée = ${upUree.toFixed(2)} (norme ${normes.upUree}) → <span class="${res.className}">${res.text}</span>`);
         }
-
-        if(values.creatU !== null && values.creatP !== null && values.creatP !== 0) {
+        if(values.creatU && values.creatP) {
             let upCreat = values.creatU / values.creatP;
             let res = getClassAndText(upCreat, parseFloat(normes.upCreat), true);
             results.push(`U/P créatinine = ${upCreat.toFixed(2)} (norme ${normes.upCreat}) → <span class="${res.className}">${res.text}</span>`);
         }
-
-        // Synthèse globale
         let countFonctionnelle = 0, countNTA = 0;
         results.forEach(line => {
             if(line.includes('ira-fonctionnelle')) countFonctionnelle++;
             if(line.includes('nta')) countNTA++;
         });
-
         if(results.length === 0) {
             showError("Pas assez de valeurs valides pour effectuer l'analyse.");
             return;
         }
-
         let synthese = "";
-        if(countFonctionnelle > countNTA) {
+        if(countFonctionnelle > countNTA)
             synthese = `<p><strong>Synthèse :</strong> La majorité des indices indiquent une <span class="ira-fonctionnelle">IRA Fonctionnelle</span>.</p>`;
-        } else if(countNTA > countFonctionnelle) {
+        else if(countNTA > countFonctionnelle)
             synthese = `<p><strong>Synthèse :</strong> La majorité des indices indiquent une <span class="nta">NTA</span>.</p>`;
-        } else {
+        else
             synthese = `<p><strong>Synthèse :</strong> Les indices sont partagés ou insuffisants pour trancher clairement.</p>`;
-        }
-
         document.getElementById('resultats').innerHTML = results.map(r => `<div class="result-line">${r}</div>`).join('') + synthese;
     }
-
-    function showError(msg) {
-        document.getElementById('resultats').innerHTML = `<div class="error">${msg}</div>`;
-    }
-    function clearError() {
-        document.getElementById('resultats').innerHTML = '';
-    }
+    function showError(msg) { document.getElementById('resultats').innerHTML = `<div class="error">${msg}</div>`; }
+    function clearError() { document.getElementById('resultats').innerHTML = ''; }
 </script>
 
 </body>
