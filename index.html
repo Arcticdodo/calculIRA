@@ -28,6 +28,30 @@
         text-align: center;
         font-size: 1.6rem;
     }
+    .app-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    .touch-toggle {
+        position: absolute;
+        right: 0;
+        min-height: 42px;
+        padding: 0 16px;
+        border: 1px solid #777;
+        border-radius: 999px;
+        background: #fff;
+        color: #222;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .touch-toggle[aria-pressed="true"] {
+        border-color: #007bff;
+        background: #007bff;
+        color: #fff;
+    }
     fieldset {
         border: 1px solid #ccc;
         border-radius: 8px;
@@ -99,6 +123,7 @@
         background-color: white;
         border-radius: 5px;
         font-size: 1em;
+        scroll-margin-top: 12px;
     }
     .result-line {
         margin-bottom: 8px;
@@ -126,6 +151,9 @@
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
         padding-bottom: 5px;
+    }
+    .touch-mode .digit-box {
+        display: flex;
     }
     .digit-box button {
         flex: 0 0 auto;
@@ -164,37 +192,88 @@
         }
     }
     @media (max-width: 520px) {
-        body { font-size: 1.05rem; }
-        h1 { font-size: 1.4rem; }
+        body {
+            padding: 8px;
+            font-size: 0.9rem;
+        }
+        .app-header {
+            min-height: 42px;
+        }
+        h1 {
+            margin: 0;
+            font-size: 1.25rem;
+        }
+        .touch-toggle {
+            min-height: 38px;
+            padding: 0 13px;
+            font-size: 0.9rem;
+        }
+        body > p {
+            display: none;
+        }
+        .fields-grid {
+            gap: 7px;
+            margin-top: 7px;
+        }
+        fieldset {
+            padding: 6px 8px 8px;
+        }
+        legend {
+            padding: 0 6px;
+            font-size: 0.9rem;
+        }
+        label {
+            margin-top: 5px;
+        }
         .input-row {
-            grid-template-columns: minmax(100px, 1fr) auto;
+            grid-template-columns: minmax(0, 1fr) 88px auto;
+            gap: 4px;
+            margin: 0;
         }
         .input-label {
-            grid-column: 1 / -1;
             font-weight: 600;
+            font-size: 0.82rem;
+            line-height: 1.05;
         }
         .input-row input[type="number"] {
-            font-size: 1.2rem;
-            max-width: 150px;
-            text-align: left;
+            padding: 5px 6px;
+            min-height: 36px;
+            font-size: 1rem;
+            text-align: right;
+        }
+        .input-unit {
+            margin-left: 0;
+            font-size: 0.72rem;
         }
         button.analyse-btn {
-            min-height: 52px;
+            min-height: 44px;
+            margin-top: 8px;
+            padding: 0.55em;
         }
-    }
-    @media (hover: none), (pointer: coarse) {
+        .result {
+            margin-top: 10px;
+        }
+        .result:not(:empty) {
+            min-height: calc(100svh - 20px);
+            box-sizing: border-box;
+        }
         .digit-box {
-            display: flex;
+            margin-top: 5px;
         }
-        .desktop-hint {
-            display: none;
+        .digit-box button {
+            min-width: 44px;
+            height: 44px;
+            font-size: 1.05rem;
         }
     }
 </style>
 </head>
 <body>
 
-<h1>Analyse IRA</h1>
+<header class="app-header">
+    <h1>Analyse IRA</h1>
+    <button type="button" id="touchToggle" class="touch-toggle" aria-pressed="false" onclick="toggleTouchMode()">Touch</button>
+</header>
 <p>Entrez les valeurs avec le clavier de votre appareil.</p>
 <p class="desktop-hint">Sur ordinateur, utilisez le clavier ou les flèches des champs numériques.</p>
 
@@ -271,6 +350,11 @@
 <div id="resultats" class="result" role="region" aria-live="polite"></div>
 
 <script>
+    function toggleTouchMode() {
+        const isActive = document.body.classList.toggle('touch-mode');
+        document.getElementById('touchToggle').setAttribute('aria-pressed', String(isActive));
+    }
+
     document.querySelectorAll('.digit-box').forEach(box => {
         for(let i=1; i<=9; i++) {
             const btn = document.createElement('button');
@@ -331,6 +415,7 @@
     });
 
     function analyser() {
+        if(document.activeElement instanceof HTMLElement) document.activeElement.blur();
         const fields = [
             {id: 'ureeP', name: "Urée plasmatique"},
             {id: 'creatP', name: "Créatininémie plasmatique"},
@@ -398,8 +483,17 @@
         else
             synthese = `<p><strong>Synthèse :</strong> Les indices sont partagés ou insuffisants pour trancher clairement.</p>`;
         document.getElementById('resultats').innerHTML = results.map(r => `<div class="result-line">${r}</div>`).join('') + synthese;
+        scrollToResults();
     }
-    function showError(msg) { document.getElementById('resultats').innerHTML = `<div class="error">${msg}</div>`; }
+    function scrollToResults() {
+        requestAnimationFrame(() => {
+            document.getElementById('resultats').scrollIntoView({behavior: 'smooth', block: 'start'});
+        });
+    }
+    function showError(msg) {
+        document.getElementById('resultats').innerHTML = `<div class="error">${msg}</div>`;
+        scrollToResults();
+    }
     function clearError() { document.getElementById('resultats').innerHTML = ''; }
 </script>
 
