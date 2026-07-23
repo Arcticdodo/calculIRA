@@ -17,10 +17,10 @@
     }
     body {
         font-family: Arial, sans-serif;
-        max-width: 700px;
+        max-width: 980px;
         margin: auto;
         background: #f4f4f4;
-        padding: 5vw;
+        padding: clamp(16px, 3vw, 36px);
         font-size: 1rem;
         box-sizing: border-box;
     }
@@ -31,9 +31,10 @@
     fieldset {
         border: 1px solid #ccc;
         border-radius: 8px;
-        padding: 4vw;
-        margin-top: 4vw;
+        padding: clamp(16px, 2.5vw, 28px);
+        margin: 0;
         background-color: #fff;
+        min-width: 0;
     }
     legend {
         font-weight: bold;
@@ -44,19 +45,33 @@
         flex-direction: column;
         margin-top: 15px;
     }
+    .fields-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 24px;
+        margin-top: 24px;
+        align-items: start;
+    }
     .input-row {
-        display: flex;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 110px auto;
         align-items: center;
+        gap: 8px;
         margin-bottom: 3px;
-        flex-wrap: wrap;
     }
     .input-row input[type="number"] {
         padding: 0.6em;
-        width: 30%;
-        min-width: 80px;
+        width: 100%;
+        min-width: 0;
         font-size: 1.1rem;
         text-align: right;
-        margin-left: 0.5em;
+        box-sizing: border-box;
+        border: 1px solid #999;
+        border-radius: 5px;
+    }
+    .input-row input[type="number"]:focus {
+        outline: 3px solid rgba(0, 123, 255, 0.25);
+        border-color: #007bff;
     }
     .input-unit {
         font-size: 0.9em;
@@ -104,8 +119,8 @@
     }
     /* Boîte de chiffres tactile avec défilement */
     .digit-box {
-        margin-top: 5px;
-        display: flex;
+        margin-top: 8px;
+        display: none;
         gap: 8px;
         flex-wrap: nowrap;
         overflow-x: auto;
@@ -136,12 +151,43 @@
     .digit-box button.clear-btn:hover {
         background-color: #d32f2f;
     }
-    @media (max-width: 430px) {
+    .desktop-hint {
+        color: #555;
+        font-size: 0.95rem;
+        margin-bottom: 0;
+    }
+    @media (max-width: 760px) {
+        .fields-grid {
+            grid-template-columns: 1fr;
+            gap: 18px;
+            margin-top: 18px;
+        }
+    }
+    @media (max-width: 520px) {
         body { font-size: 1.05rem; }
         h1 { font-size: 1.4rem; }
+        .input-row {
+            grid-template-columns: minmax(100px, 1fr) auto;
+        }
+        .input-label {
+            grid-column: 1 / -1;
+            font-weight: 600;
+        }
         .input-row input[type="number"] {
-            width: 45%;
             font-size: 1.2rem;
+            max-width: 150px;
+            text-align: left;
+        }
+        button.analyse-btn {
+            min-height: 52px;
+        }
+    }
+    @media (hover: none), (pointer: coarse) {
+        .digit-box {
+            display: flex;
+        }
+        .desktop-hint {
+            display: none;
         }
     }
 </style>
@@ -149,31 +195,33 @@
 <body>
 
 <h1>Analyse IRA</h1>
-<p>Entrez vos valeurs (cliquez sur un chiffre sous chaque champ) :</p>
+<p>Entrez les valeurs avec le clavier de votre appareil.</p>
+<p class="desktop-hint">Sur ordinateur, utilisez le clavier ou les flèches des champs numériques.</p>
 
 <form id="iraForm" onsubmit="return false;">
+  <div class="fields-grid">
     <fieldset>
         <legend>Variables plasmatiques</legend>
         <label>
             <div class="input-row">
-                Urée plasmatique :
-                <input type="number" step="any" id="ureeP" min="0" placeholder="ex: 6.5" autocomplete="off" />
+                <span class="input-label">Urée plasmatique :</span>
+                <input type="number" inputmode="decimal" step="any" id="ureeP" min="0" placeholder="ex: 6.5" autocomplete="off" />
                 <span class="input-unit">mmol/L</span>
             </div>
             <div class="digit-box" data-target="ureeP"></div>
         </label>
         <label>
             <div class="input-row">
-                Créatininémie plasmatique :
-                <input type="number" step="any" id="creatP" min="0" placeholder="ex: 90" autocomplete="off" />
+                <span class="input-label">Créatininémie plasmatique :</span>
+                <input type="number" inputmode="decimal" step="any" id="creatP" min="0" placeholder="ex: 90" autocomplete="off" />
                 <span class="input-unit">µmol/L</span>
             </div>
             <div class="digit-box" data-target="creatP"></div>
         </label>
         <label>
             <div class="input-row">
-                Natrémie :
-                <input type="number" step="any" id="naP" min="0" placeholder="ex: 140" autocomplete="off" />
+                <span class="input-label">Natrémie :</span>
+                <input type="number" inputmode="decimal" step="any" id="naP" min="0" placeholder="ex: 140" autocomplete="off" />
                 <span class="input-unit">mmol/L</span>
             </div>
             <div class="digit-box" data-target="naP"></div>
@@ -184,37 +232,38 @@
         <legend>Variables urinaires</legend>
         <label>
             <div class="input-row">
-                Urée urinaire :
-                <input type="number" step="any" id="ureeU" min="0" placeholder="ex: 250" autocomplete="off" />
+                <span class="input-label">Urée urinaire :</span>
+                <input type="number" inputmode="decimal" step="any" id="ureeU" min="0" placeholder="ex: 250" autocomplete="off" />
                 <span class="input-unit">mmol/L</span>
             </div>
             <div class="digit-box" data-target="ureeU"></div>
         </label>
         <label>
             <div class="input-row">
-                Créatinine urinaire :
-                <input type="number" step="any" id="creatU" min="0" placeholder="ex: 1000" autocomplete="off" />
+                <span class="input-label">Créatinine urinaire :</span>
+                <input type="number" inputmode="decimal" step="any" id="creatU" min="0" placeholder="ex: 1000" autocomplete="off" />
                 <span class="input-unit">µmol/L</span>
             </div>
             <div class="digit-box" data-target="creatU"></div>
         </label>
         <label>
             <div class="input-row">
-                Natriurie :
-                <input type="number" step="any" id="naU" min="0" placeholder="ex: 60" autocomplete="off" />
+                <span class="input-label">Natriurie :</span>
+                <input type="number" inputmode="decimal" step="any" id="naU" min="0" placeholder="ex: 60" autocomplete="off" />
                 <span class="input-unit">mmol/L</span>
             </div>
             <div class="digit-box" data-target="naU"></div>
         </label>
         <label>
             <div class="input-row">
-                Kaliurie :
-                <input type="number" step="any" id="kU" min="0" placeholder="ex: 30" autocomplete="off" />
+                <span class="input-label">Kaliurie :</span>
+                <input type="number" inputmode="decimal" step="any" id="kU" min="0" placeholder="ex: 30" autocomplete="off" />
                 <span class="input-unit">mmol/L</span>
             </div>
             <div class="digit-box" data-target="kU"></div>
         </label>
     </fieldset>
+  </div>
 
     <button type="button" class="analyse-btn" onclick="analyser()">Analyser</button>
 </form>
@@ -252,6 +301,19 @@
             }
         });
         box.appendChild(zeroBtn);
+
+        const decimalBtn = document.createElement('button');
+        decimalBtn.type = 'button';
+        decimalBtn.textContent = ',';
+        decimalBtn.setAttribute('aria-label', 'Séparateur décimal');
+        decimalBtn.addEventListener('click', () => {
+            const input = document.getElementById(box.dataset.target);
+            if(input && !input.value.includes('.')) {
+                input.value = input.value === '' ? '0.' : input.value + '.';
+                input.focus();
+            }
+        });
+        box.appendChild(decimalBtn);
 
         const clearBtn = document.createElement('button');
         clearBtn.type = 'button';
