@@ -117,16 +117,71 @@
     button.analyse-btn:hover {
         background-color: #45a049;
     }
+    .context-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 16px;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background: #fff;
+    }
+    .context-row label {
+        display: inline;
+        margin: 0;
+        font-weight: bold;
+    }
+    .context-row select {
+        min-height: 42px;
+        padding: 6px 34px 6px 10px;
+        border: 1px solid #888;
+        border-radius: 6px;
+        background: #fff;
+        font-size: 1rem;
+    }
     .result {
         margin-top: 20px;
-        padding: 10px;
+        padding: 18px;
         background-color: white;
-        border-radius: 5px;
-        font-size: 1em;
+        border-radius: 8px;
+        font-size: 1.2rem;
+        line-height: 1.45;
         scroll-margin-top: 12px;
     }
     .result-line {
-        margin-bottom: 8px;
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #e5e5e5;
+    }
+    .result-line:last-of-type {
+        border-bottom: 0;
+    }
+    .result-advice {
+        margin-bottom: 16px;
+        padding: 14px;
+        border-left: 5px solid #b7791f;
+        border-radius: 6px;
+        background: #fff7db;
+        font-weight: bold;
+    }
+    .limited {
+        color: #8a5a00;
+        font-weight: bold;
+    }
+    .result .synthese {
+        margin-top: 18px;
+        padding: 14px;
+        border-radius: 6px;
+        background: #f0f4f8;
+        font-size: 1.25rem;
+    }
+    .medical-note {
+        margin: 14px 0 0;
+        color: #555;
+        font-size: 0.9em;
+        font-weight: normal;
     }
     .ira-fonctionnelle {
         color: #007bff;
@@ -250,8 +305,25 @@
             margin-top: 8px;
             padding: 0.55em;
         }
+        .context-row {
+            justify-content: space-between;
+            gap: 6px;
+            margin-top: 7px;
+            padding: 5px 8px;
+        }
+        .context-row label {
+            font-size: 0.8rem;
+        }
+        .context-row select {
+            min-height: 36px;
+            max-width: 135px;
+            padding: 4px 24px 4px 7px;
+            font-size: 0.85rem;
+        }
         .result {
             margin-top: 10px;
+            padding: 14px;
+            font-size: 1.08rem;
         }
         .result:not(:empty) {
             min-height: calc(100svh - 20px);
@@ -344,6 +416,15 @@
     </fieldset>
   </div>
 
+    <div class="context-row">
+        <label for="diuretic">Diurétique avant le prélèvement&nbsp;?</label>
+        <select id="diuretic">
+            <option value="unknown">Inconnu</option>
+            <option value="no">Non</option>
+            <option value="yes">Oui</option>
+        </select>
+    </div>
+
     <button type="button" class="analyse-btn" onclick="analyser()">Analyser</button>
 </form>
 
@@ -435,12 +516,19 @@
             } else values[f.id] = valNum;
         }
         clearError();
-        const normes = {ratioUreeCreatP: "100", feNa: "1%", naK: "1", upUree: "10", upCreat: "30"};
+        const diureticStatus = document.getElementById('diuretic').value;
+        const normes = {ratioUreeCreatP: "100", feNa: "1%", feUree: "35%", naK: "1", upUree: "10", upCreat: "30"};
         function getClassAndText(value, seuil, plusGrandMeilleur) {
             if(plusGrandMeilleur) return value > seuil ? {className: "ira-fonctionnelle", text: "IRA Fonctionnelle"} : {className: "nta", text: "NTA"};
             else return value < seuil ? {className: "ira-fonctionnelle", text: "IRA Fonctionnelle"} : {className: "nta", text: "NTA"};
         }
         let results = [];
+        let advice = "";
+        if(diureticStatus === 'yes') {
+            advice = `<div class="result-advice">Sous diurétique : considérer surtout la <strong>FE urée</strong>, avec prudence. La FE Na, la natriurie et le rapport Na+/K+ urinaire sont moins fiables.</div>`;
+        } else if(diureticStatus === 'unknown') {
+            advice = `<div class="result-advice">Prise de diurétique inconnue : la FE Na, la natriurie et le rapport Na+/K+ doivent être interprétés avec prudence.</div>`;
+        }
         if(values.ureeP && values.creatP) {
             let ratio = (values.ureeP * 1000) / values.creatP;
             let res = getClassAndText(ratio, parseFloat(normes.ratioUreeCreatP), true);
@@ -448,13 +536,27 @@
         }
         if(values.naU && values.creatP && values.naP && values.creatU) {
             let feNa = ((values.naU * values.creatP) / (values.naP * values.creatU)) * 100;
-            let res = getClassAndText(feNa, parseFloat(normes.feNa), false);
-            results.push(`FE Na+ = ${feNa.toFixed(2)}% (norme ${normes.feNa}) → <span class="${res.className}">${res.text}</span>`);
+            if(diureticStatus === 'no') {
+                let res = getClassAndText(feNa, parseFloat(normes.feNa), false);
+                results.push(`FE Na+ = ${feNa.toFixed(2)}% (seuil ${normes.feNa}) → <span class="${res.className}">${res.text}</span>`);
+            } else {
+                results.push(`FE Na+ = ${feNa.toFixed(2)}% → <span class="limited">interprétation limitée si diurétique</span>`);
+            }
+        }
+        if(values.ureeU && values.creatP && values.ureeP && values.creatU) {
+            let feUree = ((values.ureeU * values.creatP) / (values.ureeP * values.creatU)) * 100;
+            let res = getClassAndText(feUree, parseFloat(normes.feUree), false);
+            let priority = diureticStatus === 'yes' ? `<strong>Indice à considérer en priorité sous diurétique :</strong> ` : '';
+            results.push(`${priority}FE urée = ${feUree.toFixed(2)}% (seuil indicatif ${normes.feUree}) → <span class="${res.className}">${res.text}</span>`);
         }
         if(values.naU && values.kU) {
             let naKRatio = values.naU / values.kU;
-            let res = getClassAndText(naKRatio, parseFloat(normes.naK), false);
-            results.push(`Na+/K+ urinaire = ${naKRatio.toFixed(2)} (norme ${normes.naK}) → <span class="${res.className}">${res.text}</span>`);
+            if(diureticStatus === 'no') {
+                let res = getClassAndText(naKRatio, parseFloat(normes.naK), false);
+                results.push(`Na+/K+ urinaire = ${naKRatio.toFixed(2)} (seuil ${normes.naK}) → <span class="${res.className}">${res.text}</span>`);
+            } else {
+                results.push(`Na+/K+ urinaire = ${naKRatio.toFixed(2)} → <span class="limited">interprétation limitée si diurétique</span>`);
+            }
         }
         if(values.ureeU && values.ureeP) {
             let upUree = values.ureeU / values.ureeP;
@@ -477,12 +579,13 @@
         }
         let synthese = "";
         if(countFonctionnelle > countNTA)
-            synthese = `<p><strong>Synthèse :</strong> La majorité des indices indiquent une <span class="ira-fonctionnelle">IRA Fonctionnelle</span>.</p>`;
+            synthese = `<p class="synthese"><strong>Synthèse :</strong> La majorité des indices indiquent une <span class="ira-fonctionnelle">IRA Fonctionnelle</span>.</p>`;
         else if(countNTA > countFonctionnelle)
-            synthese = `<p><strong>Synthèse :</strong> La majorité des indices indiquent une <span class="nta">NTA</span>.</p>`;
+            synthese = `<p class="synthese"><strong>Synthèse :</strong> La majorité des indices indiquent une <span class="nta">NTA</span>.</p>`;
         else
-            synthese = `<p><strong>Synthèse :</strong> Les indices sont partagés ou insuffisants pour trancher clairement.</p>`;
-        document.getElementById('resultats').innerHTML = results.map(r => `<div class="result-line">${r}</div>`).join('') + synthese;
+            synthese = `<p class="synthese"><strong>Synthèse :</strong> Les indices sont partagés ou insuffisants pour trancher clairement.</p>`;
+        const medicalNote = `<p class="medical-note">Interprétation indicative : même sous diurétique, la FE urée ne permet pas à elle seule de déterminer la cause de l’IRA. À confronter au contexte clinique et au sédiment urinaire.</p>`;
+        document.getElementById('resultats').innerHTML = advice + results.map(r => `<div class="result-line">${r}</div>`).join('') + synthese + medicalNote;
         scrollToResults();
     }
     function scrollToResults() {
