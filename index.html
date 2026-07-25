@@ -135,6 +135,7 @@
     }
     .context-copy {
         flex: 1;
+        min-width: 0;
     }
     .context-help {
         display: block;
@@ -159,14 +160,18 @@
         font-size: 1.2rem;
         line-height: 1.45;
         scroll-margin-top: 12px;
+        overflow-wrap: anywhere;
     }
-    .result-line {
-        margin-bottom: 12px;
-        padding-bottom: 12px;
-        border-bottom: 1px solid #e5e5e5;
-    }
-    .result-line:last-of-type {
-        border-bottom: 0;
+    .result-card {
+        max-width: 100%;
+        box-sizing: border-box;
+        margin-bottom: 10px;
+        padding: 13px 14px;
+        border: 1px solid #bbf7d0;
+        border-left: 5px solid #22c55e;
+        border-radius: 10px;
+        background: #f0fdf4;
+        box-shadow: 0 2px 8px rgba(22, 101, 52, 0.06);
     }
     .result-section-title {
         margin: 18px 0 10px;
@@ -179,23 +184,70 @@
         color: #6b4b00;
     }
     .result-advice {
-        margin-bottom: 16px;
-        padding: 14px;
+        margin-bottom: 14px;
+        padding: 11px 13px;
         border-left: 5px solid #b7791f;
         border-radius: 6px;
         background: #fff7db;
-        font-weight: bold;
+        font-size: 0.92em;
     }
     .limited {
         color: #8a5a00;
         font-weight: bold;
     }
     .result .synthese {
-        margin-top: 18px;
-        padding: 14px;
-        border-radius: 6px;
-        background: #f0f4f8;
-        font-size: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        margin: 0 0 18px;
+        padding: 18px;
+        border: 1px solid #d7dee7;
+        border-radius: 14px;
+        background: #f8fafc;
+        text-align: center;
+        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+    }
+    .synthese-label {
+        color: #64748b;
+        font-size: 0.78em;
+        font-weight: bold;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+    .synthese-verdict {
+        font-size: 1.55em;
+        font-weight: 800;
+    }
+    .synthese-detail {
+        color: #64748b;
+        font-size: 0.76em;
+    }
+    .verdict-ira {
+        border-color: #93c5fd !important;
+        background: #eff6ff !important;
+    }
+    .verdict-nta {
+        border-color: #fca5a5 !important;
+        background: #fff1f2 !important;
+    }
+    .non-interpretable-details {
+        margin-top: 14px;
+        padding: 10px 12px;
+        border: 1px solid #fde68a;
+        border-radius: 10px;
+        background: #fffbeb;
+        font-size: 0.86em;
+    }
+    .non-interpretable-details summary {
+        color: #854d0e;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .non-interpretable-item {
+        margin-top: 9px;
+        padding-top: 9px;
+        border-top: 1px solid #fde68a;
     }
     .medical-note {
         margin: 14px 0 0;
@@ -204,11 +256,19 @@
         font-weight: normal;
     }
     .ira-fonctionnelle {
-        color: #007bff;
+        display: inline-block;
+        padding: 3px 9px;
+        border-radius: 999px;
+        background: #dbeafe;
+        color: #1d4ed8;
         font-weight: bold;
     }
     .nta {
-        color: #d9534f;
+        display: inline-block;
+        padding: 3px 9px;
+        border-radius: 999px;
+        background: #fee2e2;
+        color: #b91c1c;
         font-weight: bold;
     }
     .error {
@@ -442,7 +502,7 @@
     <div class="context-row">
         <div class="context-copy">
             <label for="diuretic">Diurétique avant le prélèvement&nbsp;?</label>
-            <span class="context-help">(Anse : furosémide… ; thiazidiques/apparentés : hydrochlorothiazide, indapamide… ; épargneurs de K+ : spironolactone, éplérénone, amiloride… ; inhibiteur de l’anhydrase carbonique : acétazolamide ; osmotique : mannitol.)</span>
+            <span class="context-help">(<strong>Anse</strong> : furosémide… ; <strong>thiazidiques/apparentés</strong> : hydrochlorothiazide, indapamide… ; <strong>épargneurs de K+</strong> : spironolactone, éplérénone, amiloride… ; <strong>inhibiteur de l’anhydrase carbonique</strong> : acétazolamide ; <strong>osmotique</strong> : mannitol.)</span>
         </div>
         <select id="diuretic">
             <option value="unknown">Inconnu</option>
@@ -552,7 +612,7 @@
         let nonInterpretableResults = [];
         let advice = "";
         if(diureticStatus === 'yes') {
-            advice = `<div class="result-advice">Sous diurétique : les résultats encore utilisables sont affichés en premier. Considérer surtout la <strong>FE urée</strong>, avec prudence. Les indices dépendant du sodium urinaire ou de la concentration des urines ne sont pas classés avec leurs seuils habituels.</div>`;
+            advice = `<div class="result-advice"><strong>Sous diurétique :</strong> priorité à la FE urée, à interpréter avec prudence.</div>`;
         } else if(diureticStatus === 'unknown') {
             advice = `<div class="result-advice">Prise de diurétique inconnue : la FE Na, la natriurie et le rapport Na+/K+ doivent être interprétés avec prudence.</div>`;
         }
@@ -621,17 +681,17 @@
         }
         let synthese = "";
         if(countFonctionnelle > countNTA)
-            synthese = `<p class="synthese"><strong>Synthèse :</strong> La majorité des indices indiquent une <span class="ira-fonctionnelle">IRA Fonctionnelle</span>.</p>`;
+            synthese = `<section class="synthese verdict-ira"><span class="synthese-label">Résultat final</span><span class="synthese-verdict ira-fonctionnelle">IRA fonctionnelle</span><span class="synthese-detail">Orientation majoritaire des indices interprétables</span></section>`;
         else if(countNTA > countFonctionnelle)
-            synthese = `<p class="synthese"><strong>Synthèse :</strong> La majorité des indices indiquent une <span class="nta">NTA</span>.</p>`;
+            synthese = `<section class="synthese verdict-nta"><span class="synthese-label">Résultat final</span><span class="synthese-verdict nta">NTA</span><span class="synthese-detail">Orientation majoritaire des indices interprétables</span></section>`;
         else
-            synthese = `<p class="synthese"><strong>Synthèse :</strong> Les indices sont partagés ou insuffisants pour trancher clairement.</p>`;
+            synthese = `<section class="synthese"><span class="synthese-label">Résultat final</span><span class="synthese-verdict">Indéterminé</span><span class="synthese-detail">Indices partagés ou insuffisants</span></section>`;
         const medicalNote = `<p class="medical-note">Interprétation indicative : ${diureticStatus === 'yes' ? 'même sous diurétique, ' : ''}la FE urée ne permet pas à elle seule de déterminer la cause de l’IRA. À confronter au contexte clinique, à l’évolution de la fonction rénale et au sédiment urinaire.</p>`;
         const interpretableTitle = diureticStatus === 'yes' ? `<h2 class="result-section-title">Résultats utilisables avec prudence</h2>` : '';
         const nonInterpretableBlock = nonInterpretableResults.length
-            ? `<h2 class="result-section-title non-interpretable">Résultats non interprétables sous diurétique</h2>${nonInterpretableResults.map(r => `<div class="result-line">${r}</div>`).join('')}`
+            ? `<details class="non-interpretable-details"><summary>${nonInterpretableResults.length} résultat${nonInterpretableResults.length > 1 ? 's' : ''} non interprétable${nonInterpretableResults.length > 1 ? 's' : ''} sous diurétique</summary>${nonInterpretableResults.map(r => `<div class="non-interpretable-item">${r}</div>`).join('')}</details>`
             : '';
-        document.getElementById('resultats').innerHTML = advice + interpretableTitle + results.map(r => `<div class="result-line">${r}</div>`).join('') + nonInterpretableBlock + synthese + medicalNote;
+        document.getElementById('resultats').innerHTML = synthese + advice + interpretableTitle + results.map(r => `<div class="result-card">${r}</div>`).join('') + nonInterpretableBlock + medicalNote;
         scrollToResults();
     }
     function scrollToResults() {
