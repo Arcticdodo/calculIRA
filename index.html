@@ -133,6 +133,16 @@
         margin: 0;
         font-weight: bold;
     }
+    .context-copy {
+        flex: 1;
+    }
+    .context-help {
+        display: block;
+        margin-top: 4px;
+        color: #555;
+        font-size: 0.82rem;
+        line-height: 1.3;
+    }
     .context-row select {
         min-height: 42px;
         padding: 6px 34px 6px 10px;
@@ -157,6 +167,16 @@
     }
     .result-line:last-of-type {
         border-bottom: 0;
+    }
+    .result-section-title {
+        margin: 18px 0 10px;
+        font-size: 1.05em;
+    }
+    .result-section-title:first-child {
+        margin-top: 0;
+    }
+    .non-interpretable {
+        color: #6b4b00;
     }
     .result-advice {
         margin-bottom: 16px;
@@ -314,6 +334,9 @@
         .context-row label {
             font-size: 0.8rem;
         }
+        .context-help {
+            font-size: 0.68rem;
+        }
         .context-row select {
             min-height: 36px;
             max-width: 135px;
@@ -417,7 +440,10 @@
   </div>
 
     <div class="context-row">
-        <label for="diuretic">Diurétique avant le prélèvement&nbsp;?</label>
+        <div class="context-copy">
+            <label for="diuretic">Diurétique avant le prélèvement&nbsp;?</label>
+            <span class="context-help">(Anse : furosémide… ; thiazidiques/apparentés : hydrochlorothiazide, indapamide… ; épargneurs de K+ : spironolactone, éplérénone, amiloride… ; inhibiteur de l’anhydrase carbonique : acétazolamide ; osmotique : mannitol.)</span>
+        </div>
         <select id="diuretic">
             <option value="unknown">Inconnu</option>
             <option value="no">Non</option>
@@ -523,9 +549,10 @@
             else return value < seuil ? {className: "ira-fonctionnelle", text: "IRA Fonctionnelle"} : {className: "nta", text: "NTA"};
         }
         let results = [];
+        let nonInterpretableResults = [];
         let advice = "";
         if(diureticStatus === 'yes') {
-            advice = `<div class="result-advice">Sous diurétique : considérer surtout la <strong>FE urée</strong>, avec prudence. La FE Na, la natriurie et le rapport Na+/K+ urinaire sont moins fiables.</div>`;
+            advice = `<div class="result-advice">Sous diurétique : les résultats encore utilisables sont affichés en premier. Considérer surtout la <strong>FE urée</strong>, avec prudence. Les indices dépendant du sodium urinaire ou de la concentration des urines ne sont pas classés avec leurs seuils habituels.</div>`;
         } else if(diureticStatus === 'unknown') {
             advice = `<div class="result-advice">Prise de diurétique inconnue : la FE Na, la natriurie et le rapport Na+/K+ doivent être interprétés avec prudence.</div>`;
         }
@@ -539,9 +566,14 @@
             if(diureticStatus === 'no') {
                 let res = getClassAndText(feNa, parseFloat(normes.feNa), false);
                 results.push(`FE Na+ = ${feNa.toFixed(2)}% (seuil ${normes.feNa}) → <span class="${res.className}">${res.text}</span>`);
+            } else if(diureticStatus === 'yes') {
+                nonInterpretableResults.push(`FE Na+ = ${feNa.toFixed(2)}% → <span class="limited">non interprétable avec le seuil habituel</span> : le diurétique augmente l’excrétion urinaire de sodium.`);
             } else {
                 results.push(`FE Na+ = ${feNa.toFixed(2)}% → <span class="limited">interprétation limitée si diurétique</span>`);
             }
+        }
+        if(diureticStatus === 'yes' && values.naU) {
+            nonInterpretableResults.push(`Natriurie = ${values.naU.toFixed(1)} mmol/L → <span class="limited">non interprétable avec les seuils habituels</span> : le diurétique provoque une natriurèse.`);
         }
         if(values.ureeU && values.creatP && values.ureeP && values.creatU) {
             let feUree = ((values.ureeU * values.creatP) / (values.ureeP * values.creatU)) * 100;
@@ -554,19 +586,29 @@
             if(diureticStatus === 'no') {
                 let res = getClassAndText(naKRatio, parseFloat(normes.naK), false);
                 results.push(`Na+/K+ urinaire = ${naKRatio.toFixed(2)} (seuil ${normes.naK}) → <span class="${res.className}">${res.text}</span>`);
+            } else if(diureticStatus === 'yes') {
+                nonInterpretableResults.push(`Na+/K+ urinaire = ${naKRatio.toFixed(2)} → <span class="limited">non interprétable avec le seuil habituel</span> : le diurétique modifie la natriurie et peut aussi modifier la kaliurie.`);
             } else {
                 results.push(`Na+/K+ urinaire = ${naKRatio.toFixed(2)} → <span class="limited">interprétation limitée si diurétique</span>`);
             }
         }
         if(values.ureeU && values.ureeP) {
             let upUree = values.ureeU / values.ureeP;
-            let res = getClassAndText(upUree, parseFloat(normes.upUree), true);
-            results.push(`U/P urée = ${upUree.toFixed(2)} (norme ${normes.upUree}) → <span class="${res.className}">${res.text}</span>`);
+            if(diureticStatus === 'yes') {
+                nonInterpretableResults.push(`U/P urée = ${upUree.toFixed(2)} → <span class="limited">non interprétable avec le seuil habituel</span> : la diurèse modifie la concentration urinaire.`);
+            } else {
+                let res = getClassAndText(upUree, parseFloat(normes.upUree), true);
+                results.push(`U/P urée = ${upUree.toFixed(2)} (norme ${normes.upUree}) → <span class="${res.className}">${res.text}</span>`);
+            }
         }
         if(values.creatU && values.creatP) {
             let upCreat = values.creatU / values.creatP;
-            let res = getClassAndText(upCreat, parseFloat(normes.upCreat), true);
-            results.push(`U/P créatinine = ${upCreat.toFixed(2)} (norme ${normes.upCreat}) → <span class="${res.className}">${res.text}</span>`);
+            if(diureticStatus === 'yes') {
+                nonInterpretableResults.push(`U/P créatinine = ${upCreat.toFixed(2)} → <span class="limited">non interprétable avec le seuil habituel</span> : la diurèse modifie la concentration urinaire.`);
+            } else {
+                let res = getClassAndText(upCreat, parseFloat(normes.upCreat), true);
+                results.push(`U/P créatinine = ${upCreat.toFixed(2)} (norme ${normes.upCreat}) → <span class="${res.className}">${res.text}</span>`);
+            }
         }
         let countFonctionnelle = 0, countNTA = 0;
         results.forEach(line => {
@@ -584,8 +626,12 @@
             synthese = `<p class="synthese"><strong>Synthèse :</strong> La majorité des indices indiquent une <span class="nta">NTA</span>.</p>`;
         else
             synthese = `<p class="synthese"><strong>Synthèse :</strong> Les indices sont partagés ou insuffisants pour trancher clairement.</p>`;
-        const medicalNote = `<p class="medical-note">Interprétation indicative : même sous diurétique, la FE urée ne permet pas à elle seule de déterminer la cause de l’IRA. À confronter au contexte clinique et au sédiment urinaire.</p>`;
-        document.getElementById('resultats').innerHTML = advice + results.map(r => `<div class="result-line">${r}</div>`).join('') + synthese + medicalNote;
+        const medicalNote = `<p class="medical-note">Interprétation indicative : ${diureticStatus === 'yes' ? 'même sous diurétique, ' : ''}la FE urée ne permet pas à elle seule de déterminer la cause de l’IRA. À confronter au contexte clinique, à l’évolution de la fonction rénale et au sédiment urinaire.</p>`;
+        const interpretableTitle = diureticStatus === 'yes' ? `<h2 class="result-section-title">Résultats utilisables avec prudence</h2>` : '';
+        const nonInterpretableBlock = nonInterpretableResults.length
+            ? `<h2 class="result-section-title non-interpretable">Résultats non interprétables sous diurétique</h2>${nonInterpretableResults.map(r => `<div class="result-line">${r}</div>`).join('')}`
+            : '';
+        document.getElementById('resultats').innerHTML = advice + interpretableTitle + results.map(r => `<div class="result-line">${r}</div>`).join('') + nonInterpretableBlock + synthese + medicalNote;
         scrollToResults();
     }
     function scrollToResults() {
