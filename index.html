@@ -548,8 +548,8 @@
     }
     .input-label {
         color: #334155;
-        font-size: 0.9rem;
-        font-weight: 650;
+        font-size: 1.02rem;
+        font-weight: 750;
     }
     .input-row {
         grid-template-columns: minmax(0, 1fr) 116px auto;
@@ -612,6 +612,65 @@
         background-color: #f8fafc;
         color: var(--ink);
         font-weight: 700;
+    }
+    .context-title {
+        display: block;
+        color: #1e293b;
+        font-size: 0.95rem;
+        font-weight: 800;
+    }
+    .diuretic-options {
+        display: grid;
+        flex: 0 0 auto;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 5px;
+        padding: 5px;
+        border: 1px solid #cbd5e1;
+        border-radius: 13px;
+        background: #f1f5f9;
+    }
+    .diuretic-choice {
+        position: relative;
+        display: block;
+        margin: 0 !important;
+        cursor: pointer;
+    }
+    .diuretic-choice input {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+    .diuretic-choice span {
+        display: grid;
+        min-width: 70px;
+        min-height: 38px;
+        padding: 0 10px;
+        place-items: center;
+        border: 1px solid transparent;
+        border-radius: 9px;
+        color: #64748b;
+        font-size: 0.82rem;
+        font-weight: 800;
+        transition: color 160ms ease, background 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+    }
+    .diuretic-choice:hover span {
+        color: var(--primary-dark);
+        background: rgba(255, 255, 255, 0.7);
+    }
+    .diuretic-choice input:checked + span {
+        border-color: #99f6e4;
+        background: #fff;
+        color: var(--primary-dark);
+        box-shadow: 0 4px 12px rgba(15, 118, 110, 0.12);
+    }
+    .diuretic-choice input:focus-visible + span {
+        outline: 3px solid var(--focus);
+        outline-offset: 2px;
     }
     button.analyse-btn {
         min-height: 54px;
@@ -767,9 +826,9 @@
     }
     .result-card {
         position: relative;
-        display: flex;
+        display: block;
         min-height: 74px;
-        align-items: center;
+        align-content: center;
         margin: 0;
         padding: 15px 15px 15px 48px;
         border: 1px solid #e2e8f0;
@@ -799,6 +858,36 @@
         border-color: #dbeafe;
         background: #2563eb;
         box-shadow: 0 0 0 1px #93c5fd;
+    }
+    .result-card.card-concordant.card-nta {
+        border-color: #fca5a5;
+        background: linear-gradient(135deg, #fff, #fff1f2);
+        box-shadow: 0 10px 24px rgba(220, 38, 38, 0.12);
+    }
+    .result-card.card-concordant.card-ira {
+        border-color: #93c5fd;
+        background: linear-gradient(135deg, #fff, #eff6ff);
+        box-shadow: 0 10px 24px rgba(37, 99, 235, 0.12);
+    }
+    .result-card.card-concordant {
+        transform: translateY(-1px);
+    }
+    .result-card.pulse-index::before {
+        animation: indexPulse 1.15s ease-in-out infinite;
+    }
+    @keyframes indexPulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.34);
+            box-shadow: 0 0 0 6px rgba(20, 184, 166, 0.14);
+        }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .result-card.pulse-index::before {
+            animation: none;
+        }
     }
     .result-card .nta,
     .result-card .ira-fonctionnelle {
@@ -922,7 +1011,7 @@
             gap: 6px;
         }
         .input-label {
-            font-size: 0.78rem;
+            font-size: 0.88rem;
         }
         .input-row input[type="number"] {
             min-height: 40px;
@@ -950,6 +1039,20 @@
             min-height: 40px;
             padding: 4px 24px 4px 8px;
             font-size: 0.82rem;
+        }
+        .context-row {
+            align-items: stretch;
+            flex-direction: column;
+        }
+        .context-title {
+            font-size: 0.86rem;
+        }
+        .diuretic-options {
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .diuretic-choice span {
+            min-width: 0;
         }
         button.analyse-btn {
             min-height: 48px;
@@ -1074,14 +1177,14 @@
 
     <div class="context-row">
         <div class="context-copy">
-            <label for="diuretic">Diurétique avant le prélèvement&nbsp;?</label>
+            <span class="context-title">Diurétique avant le prélèvement&nbsp;?</span>
             <span class="context-help">(<strong>Anse</strong> : furosémide… ; <strong>thiazidiques/apparentés</strong> : hydrochlorothiazide, indapamide… ; <strong>épargneurs de K+</strong> : spironolactone, éplérénone, amiloride… ; <strong>inhibiteur de l’anhydrase carbonique</strong> : acétazolamide ; <strong>osmotique</strong> : mannitol.)</span>
         </div>
-        <select id="diuretic">
-            <option value="unknown">Inconnu</option>
-            <option value="no">Non</option>
-            <option value="yes">Oui</option>
-        </select>
+        <div class="diuretic-options" role="radiogroup" aria-label="Diurétique avant le prélèvement">
+            <label class="diuretic-choice"><input type="radio" name="diuretic" value="unknown" checked><span>Inconnu</span></label>
+            <label class="diuretic-choice"><input type="radio" name="diuretic" value="no"><span>Non</span></label>
+            <label class="diuretic-choice"><input type="radio" name="diuretic" value="yes"><span>Oui</span></label>
+        </div>
     </div>
 
     <button type="button" class="analyse-btn" onclick="analyser()">Analyser</button>
@@ -1175,7 +1278,7 @@
             } else values[f.id] = valNum;
         }
         clearError();
-        const diureticStatus = document.getElementById('diuretic').value;
+        const diureticStatus = document.querySelector('input[name="diuretic"]:checked').value;
         const normes = {ratioUreeCreatP: "100", feNa: "1%", feUree: "35%", naK: "1", upUree: "10", upCreat: "30"};
         function getClassAndText(value, seuil, plusGrandMeilleur) {
             if(plusGrandMeilleur) return value > seuil ? {className: "ira-fonctionnelle", text: "IRA Fonctionnelle"} : {className: "nta", text: "NTA"};
@@ -1192,55 +1295,55 @@
         if(values.ureeP && values.creatP) {
             let ratio = (values.ureeP * 1000) / values.creatP;
             let res = getClassAndText(ratio, parseFloat(normes.ratioUreeCreatP), true);
-            results.push(`Urée/Créat plasmatique = ${ratio.toFixed(1)} (norme ${normes.ratioUreeCreatP}) → <span class="${res.className}">${res.text}</span>`);
+            results.push(`<strong>Urée/Créat plasmatique</strong> = ${ratio.toFixed(1)} (norme ${normes.ratioUreeCreatP}) → <span class="${res.className}">${res.text}</span>`);
         }
         if(values.naU && values.creatP && values.naP && values.creatU) {
             let feNa = ((values.naU * values.creatP) / (values.naP * values.creatU)) * 100;
             if(diureticStatus === 'no') {
                 let res = getClassAndText(feNa, parseFloat(normes.feNa), false);
-                results.push(`FE Na+ = ${feNa.toFixed(2)}% (seuil ${normes.feNa}) → <span class="${res.className}">${res.text}</span>`);
+                results.push(`<strong>FE Na+</strong> = ${feNa.toFixed(2)}% (seuil ${normes.feNa}) → <span class="${res.className}">${res.text}</span>`);
             } else if(diureticStatus === 'yes') {
-                nonInterpretableResults.push(`FE Na+ = ${feNa.toFixed(2)}% → <span class="limited">non interprétable avec le seuil habituel</span> : le diurétique augmente l’excrétion urinaire de sodium.`);
+                nonInterpretableResults.push(`<strong>FE Na+</strong> = ${feNa.toFixed(2)}% → <span class="limited">non interprétable avec le seuil habituel</span> : le diurétique augmente l’excrétion urinaire de sodium.`);
             } else {
-                results.push(`FE Na+ = ${feNa.toFixed(2)}% → <span class="limited">interprétation limitée si diurétique</span>`);
+                results.push(`<strong>FE Na+</strong> = ${feNa.toFixed(2)}% → <span class="limited">interprétation limitée si diurétique</span>`);
             }
         }
         if(diureticStatus === 'yes' && values.naU) {
-            nonInterpretableResults.push(`Natriurie = ${values.naU.toFixed(1)} mmol/L → <span class="limited">non interprétable avec les seuils habituels</span> : le diurétique provoque une natriurèse.`);
+            nonInterpretableResults.push(`<strong>Natriurie</strong> = ${values.naU.toFixed(1)} mmol/L → <span class="limited">non interprétable avec les seuils habituels</span> : le diurétique provoque une natriurèse.`);
         }
         if(values.ureeU && values.creatP && values.ureeP && values.creatU) {
             let feUree = ((values.ureeU * values.creatP) / (values.ureeP * values.creatU)) * 100;
             let res = getClassAndText(feUree, parseFloat(normes.feUree), false);
             let priority = diureticStatus === 'yes' ? `<strong>Indice à considérer en priorité sous diurétique :</strong> ` : '';
-            results.push(`${priority}FE urée = ${feUree.toFixed(2)}% (seuil indicatif ${normes.feUree}) → <span class="${res.className}">${res.text}</span>`);
+            results.push(`${priority}<strong data-index="fe-uree">FE urée</strong> = ${feUree.toFixed(2)}% (seuil indicatif ${normes.feUree}) → <span class="${res.className}">${res.text}</span>`);
         }
         if(values.naU && values.kU) {
             let naKRatio = values.naU / values.kU;
             if(diureticStatus === 'no') {
                 let res = getClassAndText(naKRatio, parseFloat(normes.naK), false);
-                results.push(`Na+/K+ urinaire = ${naKRatio.toFixed(2)} (seuil ${normes.naK}) → <span class="${res.className}">${res.text}</span>`);
+                results.push(`<strong>Na+/K+ urinaire</strong> = ${naKRatio.toFixed(2)} (seuil ${normes.naK}) → <span class="${res.className}">${res.text}</span>`);
             } else if(diureticStatus === 'yes') {
-                nonInterpretableResults.push(`Na+/K+ urinaire = ${naKRatio.toFixed(2)} → <span class="limited">non interprétable avec le seuil habituel</span> : le diurétique modifie la natriurie et peut aussi modifier la kaliurie.`);
+                nonInterpretableResults.push(`<strong>Na+/K+ urinaire</strong> = ${naKRatio.toFixed(2)} → <span class="limited">non interprétable avec le seuil habituel</span> : le diurétique modifie la natriurie et peut aussi modifier la kaliurie.`);
             } else {
-                results.push(`Na+/K+ urinaire = ${naKRatio.toFixed(2)} → <span class="limited">interprétation limitée si diurétique</span>`);
+                results.push(`<strong>Na+/K+ urinaire</strong> = ${naKRatio.toFixed(2)} → <span class="limited">interprétation limitée si diurétique</span>`);
             }
         }
         if(values.ureeU && values.ureeP) {
             let upUree = values.ureeU / values.ureeP;
             if(diureticStatus === 'yes') {
-                nonInterpretableResults.push(`U/P urée = ${upUree.toFixed(2)} → <span class="limited">non interprétable avec le seuil habituel</span> : la diurèse modifie la concentration urinaire.`);
+                nonInterpretableResults.push(`<strong>U/P urée</strong> = ${upUree.toFixed(2)} → <span class="limited">non interprétable avec le seuil habituel</span> : la diurèse modifie la concentration urinaire.`);
             } else {
                 let res = getClassAndText(upUree, parseFloat(normes.upUree), true);
-                results.push(`U/P urée = ${upUree.toFixed(2)} (norme ${normes.upUree}) → <span class="${res.className}">${res.text}</span>`);
+                results.push(`<strong>U/P urée</strong> = ${upUree.toFixed(2)} (norme ${normes.upUree}) → <span class="${res.className}">${res.text}</span>`);
             }
         }
         if(values.creatU && values.creatP) {
             let upCreat = values.creatU / values.creatP;
             if(diureticStatus === 'yes') {
-                nonInterpretableResults.push(`U/P créatinine = ${upCreat.toFixed(2)} → <span class="limited">non interprétable avec le seuil habituel</span> : la diurèse modifie la concentration urinaire.`);
+                nonInterpretableResults.push(`<strong>U/P créatinine</strong> = ${upCreat.toFixed(2)} → <span class="limited">non interprétable avec le seuil habituel</span> : la diurèse modifie la concentration urinaire.`);
             } else {
                 let res = getClassAndText(upCreat, parseFloat(normes.upCreat), true);
-                results.push(`U/P créatinine = ${upCreat.toFixed(2)} (norme ${normes.upCreat}) → <span class="${res.className}">${res.text}</span>`);
+                results.push(`<strong>U/P créatinine</strong> = ${upCreat.toFixed(2)} (norme ${normes.upCreat}) → <span class="${res.className}">${res.text}</span>`);
             }
         }
         let countFonctionnelle = 0, countNTA = 0;
@@ -1262,9 +1365,12 @@
         else
             synthese = `<section class="synthese"><span class="verdict-symbol" aria-hidden="true">—</span><span class="verdict-copy"><span class="synthese-label">Orientation finale</span><span class="synthese-verdict">Indéterminée</span><span class="synthese-detail">Indices partagés ou insuffisants</span></span><span class="verdict-score"><strong>${classifiedCount}</strong> indice${classifiedCount > 1 ? 's' : ''} classé${classifiedCount > 1 ? 's' : ''}</span></section>`;
         const medicalNote = `<p class="medical-note">Interprétation indicative : ${diureticStatus === 'yes' ? 'même sous diurétique, ' : ''}la FE urée ne permet pas à elle seule de déterminer la cause de l’IRA. À confronter au contexte clinique, à l’évolution de la fonction rénale et au sédiment urinaire.</p>`;
+        const winningClass = countNTA > countFonctionnelle ? 'card-nta' : countFonctionnelle > countNTA ? 'card-ira' : '';
         const resultCards = results.map(r => {
             const cardClass = r.includes('class="nta"') ? 'card-nta' : r.includes('class="ira-fonctionnelle"') ? 'card-ira' : '';
-            return `<div class="result-card ${cardClass}">${r}</div>`;
+            const concordantClass = winningClass && cardClass === winningClass ? 'card-concordant' : '';
+            const pulseClass = diureticStatus === 'yes' && r.includes('data-index="fe-uree"') ? 'pulse-index' : '';
+            return `<div class="result-card ${cardClass} ${concordantClass} ${pulseClass}">${r}</div>`;
         }).join('');
         const interpretablePanel = `<section class="results-panel"><div class="results-heading"><div><span class="results-eyebrow">Analyse détaillée</span><h2>${diureticStatus === 'yes' ? 'Indices utilisables avec prudence' : 'Indices interprétables'}</h2></div><span class="results-count">${results.length} calcul${results.length > 1 ? 's' : ''}</span></div><div class="results-grid">${resultCards}</div></section>`;
         const nonInterpretableBlock = nonInterpretableResults.length
