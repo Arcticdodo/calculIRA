@@ -648,6 +648,202 @@
         border-radius: 13px;
         box-shadow: none;
     }
+    .result:not(:empty) {
+        background:
+            radial-gradient(circle at 95% 0%, rgba(20, 184, 166, 0.09), transparent 24rem),
+            rgba(255, 255, 255, 0.94);
+    }
+    .result .synthese {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 16px;
+        padding: 22px;
+        border: 0 !important;
+        background: linear-gradient(135deg, #0f172a, #134e4a) !important;
+        color: #fff;
+        text-align: left;
+        box-shadow: 0 18px 36px rgba(15, 23, 42, 0.2);
+    }
+    .verdict-symbol {
+        display: grid;
+        width: 54px;
+        height: 54px;
+        place-items: center;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.1);
+        color: #99f6e4;
+        font-size: 1.35rem;
+        font-weight: 900;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
+    .verdict-copy {
+        display: flex;
+        min-width: 0;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 3px;
+    }
+    .result .synthese-label {
+        color: #99f6e4;
+    }
+    .result .synthese-detail {
+        color: #cbd5e1;
+    }
+    .result .synthese-verdict {
+        color: #fff;
+        font-size: clamp(1.5rem, 4vw, 2.2rem);
+        line-height: 1;
+    }
+    .result .synthese .nta,
+    .result .synthese .ira-fonctionnelle {
+        padding: 0;
+        background: transparent;
+        color: #fff;
+        border-radius: 0;
+    }
+    .verdict-score {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 1px;
+        color: #ccfbf1;
+        font-size: 0.72rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+    .verdict-score strong {
+        color: #fff;
+        font-size: 1.25rem;
+        font-variant-numeric: tabular-nums;
+    }
+    .result-advice {
+        border: 1px solid #99f6e4;
+        border-left: 4px solid #0d9488;
+        border-radius: 12px;
+        background: #f0fdfa;
+        color: #134e4a;
+    }
+    .results-panel {
+        margin-top: 18px;
+    }
+    .results-heading {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 12px;
+    }
+    .results-eyebrow {
+        display: block;
+        margin-bottom: 3px;
+        color: var(--primary);
+        font-size: 0.7rem;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+    }
+    .results-heading h2 {
+        margin: 0;
+        color: #1e293b;
+        font-size: 1.05rem;
+        letter-spacing: -0.015em;
+    }
+    .results-count {
+        padding: 5px 9px;
+        border: 1px solid #ccfbf1;
+        border-radius: 999px;
+        background: #f0fdfa;
+        color: var(--primary-dark);
+        font-size: 0.7rem;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+    .results-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+    .result-card {
+        position: relative;
+        display: flex;
+        min-height: 74px;
+        align-items: center;
+        margin: 0;
+        padding: 15px 15px 15px 48px;
+        border: 1px solid #e2e8f0;
+        border-left: 1px solid #e2e8f0;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.96);
+        color: #334155;
+        box-shadow: 0 7px 18px rgba(15, 23, 42, 0.055);
+    }
+    .result-card::before {
+        content: "";
+        position: absolute;
+        left: 17px;
+        width: 14px;
+        height: 14px;
+        border: 5px solid #ccfbf1;
+        border-radius: 50%;
+        background: #0d9488;
+        box-shadow: 0 0 0 1px #5eead4;
+    }
+    .result-card.card-nta::before {
+        border-color: #fee2e2;
+        background: #dc2626;
+        box-shadow: 0 0 0 1px #fca5a5;
+    }
+    .result-card.card-ira::before {
+        border-color: #dbeafe;
+        background: #2563eb;
+        box-shadow: 0 0 0 1px #93c5fd;
+    }
+    .result-card .nta,
+    .result-card .ira-fonctionnelle {
+        margin-left: 4px;
+        padding: 3px 8px;
+        border-radius: 7px;
+        font-size: 0.78em;
+        letter-spacing: 0.01em;
+        white-space: nowrap;
+    }
+    .non-interpretable-details {
+        margin-top: 12px;
+        border-color: #dbe4ee;
+        background: #f8fafc;
+    }
+    .non-interpretable-details summary {
+        color: #475569;
+    }
+    .non-interpretable-item {
+        border-top-color: #e2e8f0;
+        color: #475569;
+    }
+    .medical-note {
+        display: flex;
+        gap: 9px;
+        margin-top: 15px;
+        padding-top: 14px;
+        border-top: 1px solid #e2e8f0;
+        color: #64748b;
+        font-size: 0.76em;
+    }
+    .medical-note::before {
+        content: "i";
+        display: grid;
+        flex: 0 0 auto;
+        width: 20px;
+        height: 20px;
+        place-items: center;
+        border-radius: 50%;
+        background: #e2e8f0;
+        color: #475569;
+        font-size: 0.72rem;
+        font-style: normal;
+        font-weight: 900;
+    }
     .digit-box button {
         border-color: #cbd5e1;
         border-radius: 11px;
@@ -670,6 +866,9 @@
         }
         .fields-grid {
             gap: 14px;
+        }
+        .results-grid {
+            grid-template-columns: 1fr;
         }
     }
     @media (max-width: 520px) {
@@ -762,6 +961,32 @@
             margin-top: 12px;
             padding: 12px;
             border-radius: 16px;
+        }
+        .result .synthese {
+            grid-template-columns: auto minmax(0, 1fr);
+            gap: 11px;
+            padding: 16px;
+        }
+        .verdict-symbol {
+            width: 44px;
+            height: 44px;
+            border-radius: 13px;
+        }
+        .verdict-score {
+            grid-column: 2;
+            align-items: flex-start;
+            flex-direction: row;
+            gap: 5px;
+        }
+        .verdict-score strong {
+            font-size: inherit;
+        }
+        .result-card {
+            min-height: 64px;
+            padding: 12px 12px 12px 43px;
+        }
+        .result-card::before {
+            left: 14px;
         }
     }
 </style>
@@ -1027,19 +1252,25 @@
             showError("Pas assez de valeurs valides pour effectuer l'analyse.");
             return;
         }
+        const classifiedCount = countFonctionnelle + countNTA;
+        const leadingCount = Math.max(countFonctionnelle, countNTA);
         let synthese = "";
         if(countFonctionnelle > countNTA)
-            synthese = `<section class="synthese verdict-ira"><span class="synthese-label">Résultat final</span><span class="synthese-verdict ira-fonctionnelle">IRA fonctionnelle</span><span class="synthese-detail">Orientation majoritaire des indices interprétables</span></section>`;
+            synthese = `<section class="synthese verdict-ira"><span class="verdict-symbol" aria-hidden="true">F</span><span class="verdict-copy"><span class="synthese-label">Orientation finale</span><span class="synthese-verdict ira-fonctionnelle">IRA fonctionnelle</span><span class="synthese-detail">Concordance majoritaire des indices interprétables</span></span><span class="verdict-score"><strong>${leadingCount}/${classifiedCount}</strong> indices concordants</span></section>`;
         else if(countNTA > countFonctionnelle)
-            synthese = `<section class="synthese verdict-nta"><span class="synthese-label">Résultat final</span><span class="synthese-verdict nta">NTA</span><span class="synthese-detail">Orientation majoritaire des indices interprétables</span></section>`;
+            synthese = `<section class="synthese verdict-nta"><span class="verdict-symbol" aria-hidden="true">N</span><span class="verdict-copy"><span class="synthese-label">Orientation finale</span><span class="synthese-verdict nta">NTA</span><span class="synthese-detail">Concordance majoritaire des indices interprétables</span></span><span class="verdict-score"><strong>${leadingCount}/${classifiedCount}</strong> indices concordants</span></section>`;
         else
-            synthese = `<section class="synthese"><span class="synthese-label">Résultat final</span><span class="synthese-verdict">Indéterminé</span><span class="synthese-detail">Indices partagés ou insuffisants</span></section>`;
+            synthese = `<section class="synthese"><span class="verdict-symbol" aria-hidden="true">—</span><span class="verdict-copy"><span class="synthese-label">Orientation finale</span><span class="synthese-verdict">Indéterminée</span><span class="synthese-detail">Indices partagés ou insuffisants</span></span><span class="verdict-score"><strong>${classifiedCount}</strong> indice${classifiedCount > 1 ? 's' : ''} classé${classifiedCount > 1 ? 's' : ''}</span></section>`;
         const medicalNote = `<p class="medical-note">Interprétation indicative : ${diureticStatus === 'yes' ? 'même sous diurétique, ' : ''}la FE urée ne permet pas à elle seule de déterminer la cause de l’IRA. À confronter au contexte clinique, à l’évolution de la fonction rénale et au sédiment urinaire.</p>`;
-        const interpretableTitle = diureticStatus === 'yes' ? `<h2 class="result-section-title">Résultats utilisables avec prudence</h2>` : '';
+        const resultCards = results.map(r => {
+            const cardClass = r.includes('class="nta"') ? 'card-nta' : r.includes('class="ira-fonctionnelle"') ? 'card-ira' : '';
+            return `<div class="result-card ${cardClass}">${r}</div>`;
+        }).join('');
+        const interpretablePanel = `<section class="results-panel"><div class="results-heading"><div><span class="results-eyebrow">Analyse détaillée</span><h2>${diureticStatus === 'yes' ? 'Indices utilisables avec prudence' : 'Indices interprétables'}</h2></div><span class="results-count">${results.length} calcul${results.length > 1 ? 's' : ''}</span></div><div class="results-grid">${resultCards}</div></section>`;
         const nonInterpretableBlock = nonInterpretableResults.length
             ? `<details class="non-interpretable-details"><summary>${nonInterpretableResults.length} résultat${nonInterpretableResults.length > 1 ? 's' : ''} non interprétable${nonInterpretableResults.length > 1 ? 's' : ''} sous diurétique</summary>${nonInterpretableResults.map(r => `<div class="non-interpretable-item">${r}</div>`).join('')}</details>`
             : '';
-        document.getElementById('resultats').innerHTML = synthese + advice + interpretableTitle + results.map(r => `<div class="result-card">${r}</div>`).join('') + nonInterpretableBlock + medicalNote;
+        document.getElementById('resultats').innerHTML = synthese + advice + interpretablePanel + nonInterpretableBlock + medicalNote;
         scrollToResults();
     }
     function scrollToResults() {
